@@ -20,6 +20,6 @@
 
     <update id="update">
     UPDATE `orders` SET pay_amount = pay_amount - #{payAmount},status = 1
-    where user_id = #{userId} and status = #{status};
+    where user_id = #{userId} and status = #{status}  FOR UPDATE;
   </update>
 </mapper>
