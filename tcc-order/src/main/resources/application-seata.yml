@@ -1,0 +1,24 @@
+seata:
+  enabled: true
+  application-id: ${spring.application.name}
+  service:
+    vgroup-mapping:
+      my_test_tx_group: default
+    grouplist:
+      default: 192.168.11.140:8091
+  config:
+    type: nacos
+    nacos:
+      cluster: default
+      group: SEATA_GROUP
+      application: seata-server
+      server-addr: 192.168.11.140:8848
+      namespace: 5b08206e-4d0a-4e11-9bf6-18093dd62b31
+  registry:
+    type: nacos
+    nacos:
+      cluster: default
+      group: SEATA_GROUP
+      application: seata-server
+      server-addr: 192.168.11.140:8848
+      namespace: 5b08206e-4d0a-4e11-9bf6-18093dd62b31
