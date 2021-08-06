@@ -1,13 +1,18 @@
 package com.jackgreek.config;
+import com.alibaba.druid.pool.DruidDataSource;
 import com.zaxxer.hikari.HikariDataSource;
 import io.seata.rm.datasource.DataSourceProxy;
 import io.seata.rm.datasource.xa.DataSourceProxyXA;
 import io.seata.spring.annotation.GlobalTransactionScanner;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
@@ -35,8 +40,10 @@ public class MySeataConfig {
         if (StringUtils.hasText(dataSourceProperties.getName())) {
             dataSource.setPoolName(dataSourceProperties.getName());
         }
-        //AT 代理
-        return new DataSourceProxy(dataSource);
+//        //AT 代理
+//        return new DataSourceProxy(dataSource);
+        //XA代理
+        return new DataSourceProxyXA(dataSource);
     }
 
 }
