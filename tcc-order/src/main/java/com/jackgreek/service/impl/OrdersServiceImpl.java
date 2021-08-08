@@ -71,12 +71,12 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         }
         log.info("------->扣减库存开始storage中");
         //远程方法 扣减库存
-//        result=storageApi.decrease(actionContext,order.getProductId(),order.getCount());
-//        if(!result){
-//            throw new RuntimeException("扣减库存失败");
-//        }
-//
-//        //远程方法 扣减账户余额
+        result=storageApi.decrease(actionContext,order.getProductId(),order.getCount());
+        if(!result){
+            throw new RuntimeException("扣减库存失败");
+        }
+
+        //远程方法 扣减账户余额
 //
         log.info("------->扣减账户开始account中");
       accountApi.decrease(actionContext,order.getUserId(),order.getPayAmount());
