@@ -15,7 +15,7 @@ spring:
         server-addr: 192.168.11.140:8848
         username: nacos
         password: nacos
-
+        namespace: "5b08206e-4d0a-4e11-9bf6-18093dd62b31"
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
 mybatis-plus:
@@ -31,3 +31,6 @@ mybatis-plus:
     cache-enabled: false
 server:
   port: 8080
+ribbon:
+  ReadTimeout: 500000   #负载均衡超时时间，默认值5000
+  ConnectTimeout: 300000 #ribbon请求连接的超时时间，默认值2000

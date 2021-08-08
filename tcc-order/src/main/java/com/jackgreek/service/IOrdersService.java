@@ -20,7 +20,7 @@ public interface IOrdersService extends IService<Orders> {
      * @param order
      * @return
      */
-    void create(Orders order);
+    boolean create(Orders order);
 
     /**
      * 修改订单状态

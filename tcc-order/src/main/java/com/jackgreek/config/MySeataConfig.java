@@ -3,11 +3,19 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.seata.rm.datasource.DataSourceProxy;
 import io.seata.rm.datasource.xa.DataSourceProxyXA;
 import io.seata.spring.annotation.GlobalTransactionScanner;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
@@ -26,17 +34,25 @@ import javax.sql.DataSource;
 @Configuration
 public class MySeataConfig {
 
-    @Autowired
-    DataSourceProperties dataSourceProperties;
     @Bean
-    public DataSource dataSource(DataSourceProperties dataSourceProperties) {
+    @ConfigurationProperties(prefix = "spring.datasource")
+    public DataSource hikariDataSource(){
+        return DataSourceBuilder.create().build();
+    }
 
-        HikariDataSource dataSource = dataSourceProperties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
-        if (StringUtils.hasText(dataSourceProperties.getName())) {
-            dataSource.setPoolName(dataSourceProperties.getName());
-        }
-        //AT 代理
-        return new DataSourceProxy(dataSource);
+    @Bean(name = "transactionManager")
+    @Primary
+    public DataSourceTransactionManager transactionManager(@Qualifier("hikariDataSource") DataSource hikariDataSource) {
+        return new DataSourceTransactionManager(hikariDataSource);
+    }
+
+    @Bean
+    public SqlSessionFactory sqlSessionFactory(DataSource hikariDataSource)throws Exception{
+        SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
+        bean.setDataSource(hikariDataSource);
+        bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:/mapper/*Mapper.xml"));
+        bean.setTransactionFactory(new SpringManagedTransactionFactory());
+        return bean.getObject();
     }
 
 }

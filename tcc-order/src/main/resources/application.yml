@@ -7,7 +7,7 @@ spring:
   datasource:
     username: root
     password: root
-    url: jdbc:mysql://192.168.11.140:33806/seata_order?serverTimezone=Asia/Chongqing&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&useSSL=false&verifyServerCertificate=false&autoReconnct=true&autoReconnectForPools=true&allowMultiQueries=true
+    jdbc-url: jdbc:mysql://192.168.11.140:33806/seata_order?serverTimezone=Asia/Chongqing&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&useSSL=false&verifyServerCertificate=false&autoReconnct=true&autoReconnectForPools=true&allowMultiQueries=true
     driver-class-name: com.mysql.cj.jdbc.Driver
   cloud:
     nacos:
@@ -15,12 +15,9 @@ spring:
         server-addr: 192.168.11.140:8848
         username: nacos
         password: nacos
+        namespace: "5b08206e-4d0a-4e11-9bf6-18093dd62b31"
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
-    ##指定seata配置
-#  profiles:
-#    active: seata
-
 mybatis-plus:
   mapper-locations: classpath:/mapper/*Mapper.xml
   global-config:
@@ -38,3 +35,6 @@ server:
 logging:
   level:
     com.jackgreek: debug
+ribbon:
+  ReadTimeout: 500000   #负载均衡超时时间，默认值5000
+  ConnectTimeout: 300000 #ribbon请求连接的超时时间，默认值2000

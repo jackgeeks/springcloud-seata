@@ -1,8 +1,12 @@
 package com.jackgreek.feign;
 
-import com.jackgreek.utils.R;
+import io.seata.rm.tcc.api.BusinessActionContext;
+import io.seata.rm.tcc.api.LocalTCC;
+import io.seata.rm.tcc.api.TwoPhaseBusinessAction;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @Version: 1.0
  */
 @FeignClient(value = "tcc-storage")
+@LocalTCC
 public interface StorageApi {
 
     /**
@@ -24,5 +29,21 @@ public interface StorageApi {
      * @return
      */
     @PostMapping(value = "/storage/decrease")
-    void decrease(@RequestParam("productId") Long productId, @RequestParam("count") Integer count);
+    @TwoPhaseBusinessAction(name = "storageApi", commitMethod = "commit", rollbackMethod = "rollback")
+    boolean decrease(@RequestBody BusinessActionContext actionContext,@RequestParam("productId") Long productId, @RequestParam("count") Integer count);
+    /**
+     * 提交事务
+     * @param actionContext save xid
+     * @return
+     */
+    @GetMapping(value = "/storage/commit")
+    boolean commit(@RequestBody BusinessActionContext actionContext);
+
+    /**
+     * 回滚事务
+     * @param actionContext save xid
+     * @return
+     */
+    @GetMapping(value = "/storage/rollback")
+    boolean rollback(@RequestBody BusinessActionContext actionContext);
 }

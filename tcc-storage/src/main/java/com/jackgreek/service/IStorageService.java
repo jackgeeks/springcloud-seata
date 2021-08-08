@@ -13,5 +13,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IStorageService extends IService<Storage> {
 
-    void decrease(Long productId, Integer count);
+    boolean decrease(String xid,Long productId, Integer count);
+
+    boolean rollback(String xid);
+
+    boolean commit(String xid);
 }

@@ -16,5 +16,9 @@ import java.math.BigDecimal;
  */
 public interface IAccountService extends IService<Account> {
 
-    void decrease(Long userId, BigDecimal money);
+    boolean decrease(String xid,Long userId, BigDecimal money);
+
+    boolean commit(String xid);
+
+    boolean rollback(String xid);
 }

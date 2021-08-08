@@ -3,6 +3,9 @@ package com.jackgreek.controller;
 
 import com.jackgreek.service.IStorageService;
 import com.jackgreek.utils.R;
+import io.seata.rm.tcc.api.BusinessActionContext;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/storage")
+@Slf4j
 public class StorageController {
     @Autowired
     private IStorageService storageService;
@@ -27,9 +31,28 @@ public class StorageController {
      * @return
      */
     @PostMapping("decrease")
-    public R decrease(@RequestParam("productId") Long productId, @RequestParam("count") Integer count){
-        storageService.decrease(productId,count);
-        return R.ok().put("date","Decrease storage success");
+    public boolean decrease(@RequestBody BusinessActionContext actionContext, @RequestParam("productId") Long productId, @RequestParam("count") Integer count){
+
+        return storageService.decrease(actionContext.getXid(),productId,count);
+    }
+    @RequestMapping("commit")
+    public boolean commit(@RequestBody BusinessActionContext actionContext){
+        try {
+            return storageService.commit(actionContext.getXid());
+        }catch (IllegalStateException e){
+            log.error("commit error:", e);
+            return true;
+        }
+    }
+
+    @RequestMapping("rollback")
+    public boolean rollback(@RequestBody BusinessActionContext actionContext){
+        try {
+            return storageService.rollback(actionContext.getXid());
+        }catch (IllegalStateException e){
+            log.error("rollback error:", e);
+            return true;
+        }
     }
 
 }

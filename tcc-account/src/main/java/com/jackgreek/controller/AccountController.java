@@ -3,6 +3,9 @@ package com.jackgreek.controller;
 
 import com.jackgreek.service.IAccountService;
 import com.jackgreek.utils.R;
+import io.seata.rm.tcc.api.BusinessActionContext;
+import io.seata.spring.annotation.GlobalTransactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +23,7 @@ import java.math.BigDecimal;
  */
 @RestController
 @RequestMapping("/account")
+@Slf4j
 public class AccountController {
 
     @Autowired
@@ -31,9 +35,27 @@ public class AccountController {
      * @return
      */
     @PostMapping("decrease")
-    public R decrease(@RequestParam("userId") Long userId, @RequestParam("money") BigDecimal money){
-        accountService.decrease(userId,money);
-        return R.ok().put("date","Acount decrease success");
+    public boolean   decrease(@RequestBody BusinessActionContext actionContext,@RequestParam("userId") Long userId, @RequestParam("money") BigDecimal money){
+        return accountService.decrease(actionContext.getXid(), userId,money);
+    }
+    @RequestMapping("commit")
+    public boolean commit(@RequestBody BusinessActionContext actionContext){
+        try {
+            return accountService.commit(actionContext.getXid());
+        }catch (IllegalStateException e){
+            log.error("commit error:", e);
+            return true;
+        }
+    }
+
+    @RequestMapping("rollback")
+    public boolean rollback(@RequestBody BusinessActionContext actionContext){
+        try {
+            return accountService.rollback(actionContext.getXid());
+        }catch (IllegalStateException e){
+            log.error("rollback error:", e);
+            return true;
+        }
     }
 
 }
